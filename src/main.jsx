@@ -6,6 +6,7 @@ import "./index.css"
 import Layout from "./app/Layout"
 import Home from "./app/Home"
 import NotFound from "./app/NotFound"
+import ProductDetail from "./app/ProductDetail"
 
 const router = createBrowserRouter([
   {
@@ -16,6 +17,10 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <Home />,
+      },
+      {
+        path: "producto/:id",
+        element: <ProductDetail />,
       },
     ],
   },
