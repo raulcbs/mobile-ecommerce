@@ -1,8 +1,5 @@
+import { HomePage } from "@/views/pages/home/Home-page"
+
 export default function Home() {
-  return (
-    <div>
-      <h2>Bienvenido a la página de inicio</h2>
-      <p>Esta es la vista principal de la aplicación.</p>
-    </div>
-  )
+  return <HomePage />
 }
