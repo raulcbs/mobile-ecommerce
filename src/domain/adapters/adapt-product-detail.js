@@ -1,4 +1,4 @@
-import { ProductDetail } from "@/domain/models/ProductDetail"
+import { ProductDetail } from "@/domain/models/product-detail"
 
 export function adaptProductDetail(apiProduct) {
   return new ProductDetail({

@@ -1,4 +1,4 @@
-import { fetchProducts, fetchProductDetail } from "@/infrastructure/api/productRepository"
+import { fetchProducts, fetchProductDetail } from "@/infrastructure/api/product-repository"
 
 export const getAllProducts = async () => {
   return await fetchProducts()

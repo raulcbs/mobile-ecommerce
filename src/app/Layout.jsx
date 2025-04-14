@@ -1,5 +1,5 @@
 import { Outlet } from "react-router"
-import { Header } from "@/views/shared/components/Header"
+import { Header } from "@/views/shared/components/header"
 
 export default function Layout() {
   return (

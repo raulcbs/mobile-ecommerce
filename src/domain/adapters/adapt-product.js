@@ -1,4 +1,4 @@
-import { Product } from "@/domain/models/Product"
+import { Product } from "@/domain/models/product"
 
 export function adaptProduct(apiProduct) {
   return new Product({

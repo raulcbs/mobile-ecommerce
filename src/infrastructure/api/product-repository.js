@@ -1,5 +1,5 @@
-import { adaptProduct } from "@/domain/adapters/adaptProduct"
-import { adaptProductDetail } from "@/domain/adapters/adaptProductDetail"
+import { adaptProduct } from "@/domain/adapters/adapt-product"
+import { adaptProductDetail } from "@/domain/adapters/adapt-product-detail"
 
 const API_BASE_URL = import.meta.env.VITE_API_DOMAIN
 

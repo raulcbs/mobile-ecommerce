@@ -1,4 +1,4 @@
-import { Product } from "@/domain/models/Product"
+import { Product } from "@/domain/models/product"
 
 export class ProductDetail extends Product {
   constructor({

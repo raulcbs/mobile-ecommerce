@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query"
 import { Link } from "react-router"
 import { useState, useMemo } from "react"
-import { useDebounce } from "@/views/shared/hooks/useDebounce"
+import { useDebounce } from "@/views/shared/hooks/use-debounce"
 import { productService } from "@/application/services/product-service"
-import { HomePageSkeleton } from "./Home-page-skeleton"
+import { HomePageSkeleton } from "./home-page-skeleton"
 import { SearchIcon } from "@/views/shared/icons"
 
 export function HomePage() {
