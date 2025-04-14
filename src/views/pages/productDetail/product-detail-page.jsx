@@ -1,19 +1,22 @@
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { productService } from "@/application/services/product-service"
 import { useParams } from "react-router"
-import { useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { ProductDetailPageSkeleton } from "./product-detail-page-skeleton"
 import { ProductDetailPageError } from "./product-detail-page-error"
 import { ShoppingCardIcon } from "@/views/shared/icons"
 import { useCart } from "@/views/shared/contexts/cart-context"
 import { toast } from "sonner"
+import { useProduct } from "@/views/shared/contexts/product-context"
 
 export function ProductDetailPage() {
   const { id } = useParams()
   const { updateCartCount } = useCart()
-  const [selectedColor, setSelectedColor] = useState({ code: "", name: "" })
-  const [selectedStorage, setSelectedStorage] = useState({ code: "", name: "" })
+  const { saveProductInfo } = useProduct()
+  const [selectedColor, setSelectedColor] = useState(null)
+  const [selectedStorage, setSelectedStorage] = useState(null)
   const [addingToCart, setAddingToCart] = useState(false)
+  const productInfoSaved = useRef(false)
 
   const {
     data: product,
@@ -25,6 +28,25 @@ export function ProductDetailPage() {
     staleTime: 60 * 60 * 1000,
     cacheTime: 60 * 60 * 1000,
   })
+
+  useEffect(() => {
+    if (product && !productInfoSaved.current) {
+      saveProductInfo(product)
+      productInfoSaved.current = true
+    }
+  }, [product, saveProductInfo])
+
+  useEffect(() => {
+    if (!product) return
+
+    if (product.colors?.length > 0 && selectedColor === null) {
+      setSelectedColor(product.colors[0])
+    }
+
+    if (product.storages?.length > 0 && selectedStorage === null) {
+      setSelectedStorage(product.storages[0])
+    }
+  }, [product, selectedColor, selectedStorage])
 
   const addToCartMutation = useMutation({
     mutationFn: ({ productId, colorCode, storageCode }) =>
@@ -40,19 +62,22 @@ export function ProductDetailPage() {
     },
   })
 
-  if (isLoading) return <ProductDetailPageSkeleton />
-  if (isError) return <ProductDetailPageError />
+  const productDetails = useMemo(() => {
+    if (!product) return []
+    const details = [
+      { label: "Brand", value: product.brand },
+      { label: "Model", value: product.model },
+      { label: "Price", value: `$${product.price}` },
+      { label: "Description", value: product.description },
+      { label: "Colors", value: product.colors.map((color) => color.name).join(", ") },
+      { label: "Storage Options", value: product.storages.map((storage) => storage.name).join(", ") },
+    ]
 
-  if (!selectedColor.code) {
-    setSelectedColor(product.colors[0])
-  }
-
-  if (!selectedStorage.code) {
-    setSelectedStorage(product.storages[0])
-  }
+    return details
+  }, [product])
 
   const handleAddToCart = () => {
-    if (!product.isAvailable) return
+    if (!product || !selectedColor || !selectedStorage) return
 
     setAddingToCart(true)
     addToCartMutation.mutate({
@@ -62,19 +87,8 @@ export function ProductDetailPage() {
     })
   }
 
-  const productDetails = [
-    { label: "Brand", value: product.brand },
-    { label: "Model", value: product.model },
-    { label: "Price", value: product.formattedPrice },
-    { label: "CPU", value: product.cpu },
-    { label: "RAM", value: product.ram },
-    { label: "Operating System", value: product.os },
-    { label: "Display", value: product.displayType },
-    { label: "Battery", value: product.battery },
-    { label: "Cameras", value: `Main: ${product.primaryCamera}\nFront: ${product.secondaryCamera}` },
-    { label: "Dimensions", value: product.dimentions },
-    { label: "Weight", value: product.weight },
-  ]
+  if (isLoading) return <ProductDetailPageSkeleton />
+  if (isError) return <ProductDetailPageError />
 
   return (
     <div className="w-full animate-appear">
@@ -136,7 +150,7 @@ export function ProductDetailPage() {
                         key={color.code}
                         onClick={() => setSelectedColor(color)}
                         className={`px-4 py-2 rounded-lg border ${
-                          selectedColor?.code === color.code
+                          selectedColor && selectedColor.code === color.code
                             ? "border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
                             : "border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
                         }`}
@@ -155,7 +169,7 @@ export function ProductDetailPage() {
                         key={storage.code}
                         onClick={() => setSelectedStorage(storage)}
                         className={`px-4 py-2 rounded-lg border ${
-                          selectedStorage.code === storage.code
+                          selectedStorage && selectedStorage.code === storage.code
                             ? "border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
                             : "border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
                         }`}
