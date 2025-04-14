@@ -3,10 +3,10 @@ import ReactDOM from "react-dom/client"
 import { createBrowserRouter, RouterProvider } from "react-router"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import "./index.css"
-import Layout from "./app/Layout"
-import Home from "./app/Home"
-import NotFound from "./app/NotFound"
-import ProductDetail from "./app/ProductDetail"
+import Layout from "@/app/layout"
+import Home from "@/app/home"
+import ProductDetail from "@/app/product-detail"
+import NotFound from "@/app/not-found"
 
 const router = createBrowserRouter([
   {
