@@ -1,15 +1,19 @@
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { productService } from "@/application/services/product-service"
 import { useParams } from "react-router"
 import { useState } from "react"
 import { ProductDetailPageSkeleton } from "./product-detail-page-skeleton"
 import { ProductDetailPageError } from "./product-detail-page-error"
 import { ShoppingCardIcon } from "@/views/shared/icons"
+import { useCart } from "@/views/shared/contexts/cart-context"
+import { toast } from "sonner"
 
 export function ProductDetailPage() {
   const { id } = useParams()
+  const { updateCartCount } = useCart()
   const [selectedColor, setSelectedColor] = useState({ code: "", name: "" })
   const [selectedStorage, setSelectedStorage] = useState({ code: "", name: "" })
+  const [addingToCart, setAddingToCart] = useState(false)
 
   const {
     data: product,
@@ -22,6 +26,20 @@ export function ProductDetailPage() {
     cacheTime: 60 * 60 * 1000,
   })
 
+  const addToCartMutation = useMutation({
+    mutationFn: ({ productId, colorCode, storageCode }) =>
+      productService.postProductToCart({ productId, colorCode, storageCode }),
+    onSuccess: (data) => {
+      toast.success("Product added to cart successfully!")
+      updateCartCount(data.count)
+      setAddingToCart(false)
+    },
+    onError: () => {
+      toast.error("Failed to add product to cart")
+      setAddingToCart(false)
+    },
+  })
+
   if (isLoading) return <ProductDetailPageSkeleton />
   if (isError) return <ProductDetailPageError />
 
@@ -31,6 +49,17 @@ export function ProductDetailPage() {
 
   if (!selectedStorage.code) {
     setSelectedStorage(product.storages[0])
+  }
+
+  const handleAddToCart = () => {
+    if (!product.isAvailable) return
+
+    setAddingToCart(true)
+    addToCartMutation.mutate({
+      productId: product.id,
+      colorCode: selectedColor.code,
+      storageCode: selectedStorage.code,
+    })
   }
 
   const productDetails = [
@@ -139,11 +168,12 @@ export function ProductDetailPage() {
 
                 <button
                   type="button"
-                  className="w-full bg-blue-700 text-white py-3 px-6 rounded-lg hover:bg-blue-800 active:bg-blue-900 transition-colors flex items-center justify-center space-x-2 font-medium dark:bg-blue-600 dark:hover:bg-blue-700 dark:active:bg-blue-900 mt-4 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={!product.isAvailable}
+                  className={`${addingToCart && "animate-pulse"} cursor-pointer w-full bg-blue-700 text-white py-3 px-6 rounded-lg hover:bg-blue-800 active:bg-blue-900 transition-colors flex items-center justify-center space-x-2 font-medium dark:bg-blue-600 dark:hover:bg-blue-700 dark:active:bg-blue-900 mt-4 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed`}
+                  disabled={!product.isAvailable || addingToCart}
+                  onClick={handleAddToCart}
                 >
                   <ShoppingCardIcon className="w-5 h-5" />
-                  <span>{product.isAvailable ? "Add to Cart" : "Not Available"}</span>
+                  <span>{addingToCart ? "Adding..." : product.isAvailable ? "Add to Cart" : "Not Available"}</span>
                 </button>
               </div>
             </div>
