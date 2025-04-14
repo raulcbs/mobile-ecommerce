@@ -1,14 +1,20 @@
 import { useQuery } from "@tanstack/react-query"
 import { Link } from "react-router"
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { useDebounce } from "@/views/shared/hooks/use-debounce"
 import { productService } from "@/application/services/product-service"
 import { HomePageSkeleton } from "./home-page-skeleton"
 import { SearchIcon } from "@/views/shared/icons"
+import { useProduct } from "@/views/shared/contexts/product-context"
 
 export function HomePage() {
   const [searchTerm, setSearchTerm] = useState("")
   const debouncedSearchTerm = useDebounce(searchTerm)
+  const { clearProductInfo } = useProduct()
+
+  useEffect(() => {
+    clearProductInfo()
+  }, [clearProductInfo])
 
   const {
     data: products = [],
