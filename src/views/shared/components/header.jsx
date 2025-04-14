@@ -1,6 +1,7 @@
 import { Link } from "react-router"
 import { HeroIcon, ShoppingCardIcon } from "@/views/shared/icons"
 import { useCart } from "@/views/shared/contexts/cart-context"
+import { Breadcrumb } from "./breadcrumb"
 
 export function Header() {
   const { cartCount } = useCart()
@@ -14,11 +15,11 @@ export function Header() {
             TecnoPocket
           </span>
         </Link>
-
+        <Breadcrumb />
         <div className="relative inline-flex items-center p-3 font-medium text-center">
           <ShoppingCardIcon />
-          <span className="sr-only">Notifications</span>
-          <div className="absolute inline-flex items-center justify-center w-5 h-5 text-sm font-bold -top-2 -end-2 ">
+          <span className="sr-only">Cart items</span>
+          <div className="absolute inline-flex items-center justify-center p-1 px-2 text-xs font-bold text-white bg-blue-600 rounded-full -top-2 -end-2">
             {cartCount}
           </div>
         </div>
